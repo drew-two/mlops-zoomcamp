@@ -73,11 +73,15 @@ def run(data_path, log_top):
         order_by=["metrics.test_rmse ASC"]
     )[0]
 
+    print('\n\n')
     print(f"run id: {best_run.info.run_id}, rmse: {best_run.data.metrics['test_rmse']:.4f}")
+    print('\n\n')
 
     # register the best model
-    model_uri = f"runs:/{best_run.info.run_id}/test_best_model"
-    mlflow.register_model(model_uri=model_uri, name="EXPERIMENT_NAME")
+    run_id = best_run.info.run_id
+    model_uri = f"runs:/{run_id}/best_test_model"
+    mlflow.register_model(model_uri=model_uri, name=EXPERIMENT_NAME)
+
 
 if __name__ == '__main__':
 
