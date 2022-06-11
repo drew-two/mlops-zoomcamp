@@ -2,19 +2,20 @@ import pandas as pd
 import pickle
 
 from sklearn.feature_extraction import DictVectorizer
-from sklearn.linear_model import LinearRegression, Lasso
+from sklearn.linear_model import LinearRegression, Lasso, Ridge
 from sklearn.metrics import mean_squared_error
-
-import mlflow
 
 import xgboost as xgb
 
 from hyperopt import fmin, tpe, hp, STATUS_OK, Trials
 from hyperopt.pyll import scope
 
+import mlflow
+
 from prefect import flow, task
 from prefect.task_runners import SequentialTaskRunner
 
+@task
 def read_dataframe(filename):
     df = pd.read_parquet(filename)
 
@@ -32,16 +33,17 @@ def read_dataframe(filename):
     return df
 
 @task
-def add_features(train_path, val_path):
+def add_features(df_train, df_val):
+    # df_train = read_dataframe(train_path)
+    # df_val = read_dataframe(val_path)
 
-    df_train = read_dataframe(train_path)
-    df_val = read_dataframe(val_path)
-
-    print(df_train.columns.values)
     print(len(df_train))
     print(len(df_val))
 
-    categorical = []#['PU_DO'] #'PULocationID', 'DOLocationID']
+    df_train['PU_DO'] = df_train['PULocationID'] + '_' + df_train['DOLocationID']
+    df_val['PU_DO'] = df_val['PULocationID'] + '_' + df_val['DOLocationID']
+
+    categorical = ['PU_DO'] #'PULocationID', 'DOLocationID']
     numerical = ['trip_distance']
 
     dv = DictVectorizer()
@@ -94,8 +96,7 @@ def train_model_search(train, valid, y_val):
         max_evals=1,
         trials=Trials()
     )
-
-    return best_result
+    return
 
 @task
 def train_best_model(train, valid, y_val, dv):
@@ -131,18 +132,27 @@ def train_best_model(train, valid, y_val, dv):
         mlflow.xgboost.log_model(booster, artifact_path="models_mlflow")
 
 @flow(task_runner=SequentialTaskRunner())
-def main(train_path: str = './data/green_tripdata_2021-01.parquet', 
-                val_path: str = './data/green_tripdata_2021-02.parquet'):
-
-    mlflow.set_tracking_uri("http://localhost:5000")
+def main(train_path: str="./data/green_tripdata_2021-01.parquet",
+        val_path: str="./data/green_tripdata_2021-02.parquet"):
+    mlflow.set_tracking_uri("sqlite:///mlflow.db")
     mlflow.set_experiment("nyc-taxi-experiment")
-
-    X_train, X_val, y_train, y_val, dv = add_features(train_path, val_path).result()
-
+    X_train = read_dataframe(train_path)
+    X_val = read_dataframe(val_path)
+    X_train, X_val, y_train, y_val, dv = add_features(X_train, X_val).result()
     train = xgb.DMatrix(X_train, label=y_train)
     valid = xgb.DMatrix(X_val, label=y_val)
+    train_model_search(train, valid, y_val)
+    train_best_model(train, valid, y_val, dv)
 
-    # train_model_search(train, valid, y_val)
-    # train_best_model(train, valid, y_val, dv)
+from prefect.deployments import DeploymentSpec
+from prefect.orion.schemas.schedules import IntervalSchedule
+from prefect.flow_runners import SubprocessFlowRunner
+from datetime import timedelta
 
-main()
+DeploymentSpec(
+    flow=main,
+    name="model_training",
+    schedule=IntervalSchedule(interval=timedelta(minutes=5)),
+    flow_runner=SubprocessFlowRunner(),
+    tags=["ml"]
+)
