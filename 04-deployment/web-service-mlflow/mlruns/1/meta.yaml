@@ -1,0 +1,4 @@
+artifact_location: file:///mnt/e/andre/OneDrive%20-%20The%20University%20of%20Western%20Ontario/mlops-zoomcamp/04-deployment/web-service-mlflow/mlruns/1
+experiment_id: '1'
+lifecycle_stage: active
+name: green-taxi-duration

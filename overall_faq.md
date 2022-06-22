@@ -6,3 +6,5 @@
 4. Edit E:\andre\.ssh\config in Windows with new IP
 	a. Do NOT copy from terminal
 5. Launch VS Code remote
+
+mlflow server --backend-store-uri sqlite:///backend.db --default-artifact-root ./artifacts_local
