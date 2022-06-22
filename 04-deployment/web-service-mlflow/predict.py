@@ -6,26 +6,17 @@ from mlflow.tracking import MlflowClient
 from flask import Flask, request, jsonify
 
 
-# RUN_ID = os.getenv('RUN_ID')
-RUN_ID = '86bf545d5c6c4a14b59b44c933a4c42b'
+MLFLOW_TRACKING_URI = 'http://127.0.0.1:5000'
+print(f"Connecting to MLflow at {MLFLOW_TRACKING_URI}...")
+mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
+RUN_ID = '86bf545d5c6c4a14b59b44c933a4c42b'
 print(f"Getting model from {RUN_ID}")
 # logged_model = f's3://mlflow-models-alexey/1/{RUN_ID}/artifacts/model'
 logged_model = f'runs:/{RUN_ID}/model'
 
-MLFLOW_TRACKING_URI = 'http://127.0.0.1:5000'
-print(f"Connecting to MLflow at {MLFLOW_TRACKING_URI}...")
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
-# mlflow.set_experiment("green-taxi-duration")
-# client = MlflowClient(tracking_uri=MLFLOW_TRACKING_URI)
-
 model = mlflow.pyfunc.load_model(logged_model)
 
-# path = client.download_artifacts(run_id=RUN_ID, path='dict_vectorizer.bin')
-# print(f"Downloading the dict vectorizer to {path}")
-
-# with open(path, 'rb') as f_out:
-#     dv = pickle.load(f_out)
 
 def prepare_features(ride):
     features = {}
