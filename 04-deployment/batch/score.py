@@ -49,23 +49,23 @@ def prepare_dictionaries(df: pd.DataFrame):
 
 
 def load_model(run_id):
-    logged_model = f's3://mlflow-models-alexey/1/{run_id}/artifacts/model'
+    logged_model = f"s3://mlops-04-mlflow/1/{run_id}/artifacts/model/"
     model = mlflow.pyfunc.load_model(logged_model)
     return model
 
 
 def apply_model(input_file, run_id, output_file):
-    print(f'reading the data from {input_file}...')
+    logger(f'reading the data from {input_file}...')
     df = read_dataframe(input_file)
     dicts = prepare_dictionaries(df)
 
-    print(f'loading the model with RUN_ID={run_id}...')
+    logger(f'loading the model with RUN_ID={run_id}...')
     model = load_model(run_id)
 
-    print(f'applying the model...')
+    logger(f'applying the model...')
     y_pred = model.predict(dicts)
 
-    print(f'saving the result to {output_file}...')
+    logger(f'saving the result to {output_file}...')
     df_result = pd.DataFrame()
     df_result['ride_id'] = df['ride_id']
     df_result['lpep_pickup_datetime'] = df['lpep_pickup_datetime']
@@ -87,7 +87,7 @@ def run():
     input_file = f'https://s3.amazonaws.com/nyc-tlc/trip+data/{taxi_type}_tripdata_{year:04d}-{month:02d}.parquet'
     output_file = f'output/{taxi_type}/{year:04d}-{month:02d}.parquet'
 
-    run_id = sys.argv[4] # 'e1efc53e9bd149078b0c12aeaa6365df'
+    run_id = sys.argv[4] # 'd30b9e612c7d437685d685bdfb2152f1'
 
     apply_model(
         input_file=input_file,

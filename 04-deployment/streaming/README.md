@@ -54,7 +54,7 @@ aws kinesis put-record \
             "DOLocationID": 205,
             "trip_distance": 3.66
         }, 
-        "ride_id": 156
+        "ride_id": 157
     }'
 ```
 
@@ -107,7 +107,7 @@ Running the test
 
 ```bash
 export PREDICTIONS_STREAM_NAME="ride_predictions"
-export RUN_ID="e1efc53e9bd149078b0c12aeaa6365df"
+export RUN_ID="86bf545d5c6c4a14b59b44c933a4c42b"
 export TEST_RUN="True"
 
 python test.py
@@ -122,15 +122,15 @@ docker build -t stream-model-duration:v1 .
 docker run -it --rm \
     -p 8080:8080 \
     -e PREDICTIONS_STREAM_NAME="ride_predictions" \
-    -e RUN_ID="e1efc53e9bd149078b0c12aeaa6365df" \
+    -e RUN_ID="86bf545d5c6c4a14b59b44c933a4c42b" \
     -e TEST_RUN="True" \
-    -e AWS_DEFAULT_REGION="eu-west-1" \
+    -e AWS_DEFAULT_REGION="us-east-1" \
     stream-model-duration:v1
 
 docker run -it --rm \
     -p 8080:8080 \
     -e PREDICTIONS_STREAM_NAME="ride_predictions" \
-    -e RUN_ID="e1efc53e9bd149078b0c12aeaa6365df" \
+    -e RUN_ID="86bf545d5c6c4a14b59b44c933a4c42b" \
     -e TEST_RUN="True" \
     -e AWS_ACCESS_KEY_ID="${AWS_ACCESS_KEY_ID}" \
     -e AWS_SECRET_ACCESS_KEY="${AWS_SECRET_ACCESS_KEY}" \
@@ -158,7 +158,7 @@ $(aws ecr get-login --no-include-email)
 Pushing 
 
 ```bash
-REMOTE_URI="387546586013.dkr.ecr.eu-west-1.amazonaws.com/duration-model"
+REMOTE_URI="183665471551.dkr.ecr.us-east-1.amazonaws.com/duration-model"
 REMOTE_TAG="v1"
 REMOTE_IMAGE=${REMOTE_URI}:${REMOTE_TAG}
 

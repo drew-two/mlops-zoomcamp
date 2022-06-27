@@ -2,17 +2,28 @@ import os
 import json
 import boto3
 import base64
-
 import mlflow
+import sys
+
+unbuffered = os.fdopen(sys.stdout.fileno(), 'w', 0)
+sys.stdout = unbuffered
+logger('test')
 
 kinesis_client = boto3.client('kinesis')
 
 PREDICTIONS_STREAM_NAME = os.getenv('PREDICTIONS_STREAM_NAME', 'ride_predictions')
 
+s3 = boto3.resource('s3')
+my_bucket = s3.Bucket('mlops-04-mlflow')
+
+if my_bucket.creation_date:
+   logger("The bucket exists")
+else:
+   logger("The bucket does not exist")
 
 RUN_ID = os.getenv('RUN_ID')
 
-logged_model = f's3://mlflow-models-alexey/1/{RUN_ID}/artifacts/model'
+logged_model = f's3://mlops-04-mlflow/1/{RUN_ID}/artifacts/model'
 # logged_model = f'runs:/{RUN_ID}/model'
 model = mlflow.pyfunc.load_model(logged_model)
 

@@ -6,14 +6,13 @@ from mlflow.tracking import MlflowClient
 from flask import Flask, request, jsonify
 
 
-MLFLOW_TRACKING_URI = 'http://127.0.0.1:5000'
-print(f"Connecting to MLflow at {MLFLOW_TRACKING_URI}...")
-mlflow.set_tracking_uri("http://127.0.0.1:5000")
+# MLFLOW_TRACKING_URI = 'http://127.0.0.1:5000'
+# print(f"Connecting to MLflow at {MLFLOW_TRACKING_URI}...")
+# mlflow.set_tracking_uri("http://127.0.0.1:5000")
 
-RUN_ID = '86bf545d5c6c4a14b59b44c933a4c42b'
-print(f"Getting model from {RUN_ID}")
-# logged_model = f's3://mlflow-models-alexey/1/{RUN_ID}/artifacts/model'
-logged_model = f'runs:/{RUN_ID}/model'
+RUN_ID = os.getenv('RUN_ID')
+logger(f"Getting model from {RUN_ID}")
+logged_model = f"s3://mlops-04-mlflow/1/{RUN_ID}/artifacts/model/"
 
 model = mlflow.pyfunc.load_model(logged_model)
 
