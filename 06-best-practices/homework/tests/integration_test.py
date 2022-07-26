@@ -40,6 +40,10 @@ os.system('%s %s %s %s' % (sys.executable,
                         os.path.join('2021'),
                         os.path.join('1')))
 
+default_input_pattern = 's3://nyc-duration/taxi_type=fhv/year={year:04d}/month={month:02d}/predictions.parquet'
+input_pattern = os.getenv('OUTPUT_FILE_PATTERN', default_input_pattern)
+input_pattern.format(year=year, month=month)
+
 df = pd.read_parquet('s3://nyc-duration/out/2021-01.parquet', storage_options=options)
 
-print(df['predicted_duration'].sum())
+print(f"Sum of predicted durations is {df['predicted_duration'].sum()}")
