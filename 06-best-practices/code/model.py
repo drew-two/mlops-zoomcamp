@@ -76,6 +76,7 @@ class ModelService:
 
         return {'predictions': predictions_events}
 
+
 class KinesisCallback:
     def __init__(self, kinesis_client, prediction_stream_name):
         self.kinesis_client = kinesis_client
@@ -89,6 +90,7 @@ class KinesisCallback:
             Data=json.dumps(prediction_event),
             PartitionKey=str(ride_id),
         )
+
 
 def create_kinesis_client():
     endpoint_url = os.getenv('KINESIS_ENDPOINT_URL')

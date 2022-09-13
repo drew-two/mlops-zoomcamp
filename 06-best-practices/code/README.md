@@ -82,7 +82,7 @@ make test
 ```
 
 
-To prepare the project, run 
+To prepare the project, run
 
 ```bash
 make setup
@@ -106,7 +106,7 @@ w/ Terraform
 3. To test the pipeline end-to-end with our new cloud infra:
     ```
     . ./scripts/test_cloud_e2e.sh
-    ``` 
+    ```
 
 4. And then check on CloudWatch logs. Or try `get-records` on the `output_kinesis_stream` (refer to `integration_test`)
 
@@ -130,4 +130,3 @@ Had to set it via `aws lambda update-function-configuration` cli command (refer 
     - generate metrics offline -> set env vars for lambda w/ stage-based deployments
     - train_pipeline -> model registry & update run_id
     - In practice, change in mlflow / db -> get curr run_id
-    
